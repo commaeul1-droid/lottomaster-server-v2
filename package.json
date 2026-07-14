@@ -1,0 +1,23 @@
+{
+  "name": "lottomaster-server-v2",
+  "version": "2.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "update": "node scripts/update_lotto_data.js",
+    "collect": "node scripts/fetch_latest_draw.js",
+    "sync": "node scripts/sync_supabase.js",
+    "health": "node scripts/health_check.js",
+    "validate": "node scripts/validate_data.js",
+    "test": "node --test",
+    "lint": "node --check scripts/update_lotto_data.js && node --check scripts/fetch_latest_draw.js && node --check scripts/sync_supabase.js && node --check src/update.js && node --check src/health-check.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "cheerio": "^1.1.2",
+    "playwright": "^1.55.0"
+  }
+}

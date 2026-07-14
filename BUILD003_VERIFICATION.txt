@@ -1,0 +1,13 @@
+LottoMaster Server V2 Build003 verification
+
+- npm ci: PASS
+- npm test: PASS (2 tests)
+- npm run validate: PASS
+- CSV rows: 1231
+- Latest seed round: 1231
+- package-lock.json: included
+- .github/workflows/update-lotto-data.yml: included
+- .github/workflows/health-check.yml: included
+- scripts: 6 files included
+
+Note: automatic collection can still be blocked by the source website. The project includes HTTP, Playwright browser, external source, and emergency manual collectors, but no claim of guaranteed source availability is made.
