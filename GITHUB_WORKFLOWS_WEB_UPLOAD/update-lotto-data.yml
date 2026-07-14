@@ -1,0 +1,71 @@
+name: LottoMaster Server V2 Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      round:
+        description: 'Emergency only: round'
+        required: false
+        type: string
+      numbers:
+        description: 'Emergency only: 6 numbers separated by comma'
+        required: false
+        type: string
+      bonus:
+        description: 'Emergency only: bonus number'
+        required: false
+        type: string
+      draw_date:
+        description: 'Emergency only: YYYY-MM-DD'
+        required: false
+        type: string
+  schedule:
+    - cron: '10 12 * * 6'
+    - cron: '40 12 * * 6'
+    - cron: '10 13 * * 6'
+    - cron: '10 23 * * 6'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lotto-data-v2
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Collect, validate and sync
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          LOTTO_SOURCE_URLS: ${{ secrets.LOTTO_SOURCE_URLS }}
+          MANUAL_ROUND: ${{ inputs.round }}
+          MANUAL_NUMBERS: ${{ inputs.numbers }}
+          MANUAL_BONUS: ${{ inputs.bonus }}
+          MANUAL_DRAW_DATE: ${{ inputs.draw_date }}
+        run: npm run update
+      - run: npm run validate
+      - name: Commit generated data
+        run: |
+          if git diff --quiet -- data; then
+            echo "No data change"
+            exit 0
+          fi
+          git config user.name "lottomaster-data-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git commit -m "data: update lotto results"
+          git push
