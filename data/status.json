@@ -1,11 +1,9 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-07-12T07:46:47.487Z",
+  "updatedAt": "2026-07-16T06:02:49.950Z",
   "ok": true,
-  "changed": false,
-  "source": "migration-seed",
-  "agreement": 1,
-  "attempts": [],
-  "message": "V2 initialized from existing seed CSV.",
-  "latestRound": 1231
+  "stage": "health",
+  "csvRows": 1232,
+  "latestRound": 1232,
+  "latestJsonRound": 1232
 }

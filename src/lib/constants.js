@@ -1,4 +1,5 @@
 export const RESULT_URL = 'https://www.dhlottery.co.kr/lt645/result';
+export const OFFICIAL_RESULT_API_URL = 'https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do';
 export const CSV_PATH = 'data/lotto_seed.csv';
 export const LATEST_PATH = 'data/latest.json';
 export const DRAWS_PATH = 'data/draws.json';

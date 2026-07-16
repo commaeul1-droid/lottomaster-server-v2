@@ -1,0 +1,19 @@
+{
+  "code": "0000",
+  "message": "success",
+  "data": {
+    "list": [
+      {
+        "ltEpsd": "1232",
+        "ltRflYmd": "20260711",
+        "tm1WnNo": 1,
+        "tm2WnNo": 8,
+        "tm3WnNo": 15,
+        "tm4WnNo": 23,
+        "tm5WnNo": 32,
+        "tm6WnNo": 45,
+        "bnsWnNo": 7
+      }
+    ]
+  }
+}

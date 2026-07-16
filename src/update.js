@@ -1,3 +1,4 @@
+import { collectViaOfficialApi } from './collectors/official-api-collector.js';
 import { collectViaHttp } from './collectors/http-collector.js';
 import { collectViaBrowser } from './collectors/browser-collector.js';
 import { collectViaExternalSources } from './collectors/external-collector.js';
@@ -17,11 +18,20 @@ async function main() {
     return;
   }
 
+  // Read existing data before collection so the new official API can request
+  // only rounds newer than the locally stored cursor.
+  const existingRows = await readCsv();
+  const existingLatestRound = existingRows.at(-1)?.round ?? null;
+
   const attempts = [];
   const manual = collectManual();
   const collectors = [
     ...(manual ? [{ name: 'manual-emergency', run: async () => manual }] : []),
     ...(process.env.LOTTO_SOURCE_URLS ? [{ name: 'external-source', run: () => collectViaExternalSources(process.env.LOTTO_SOURCE_URLS) }] : []),
+    {
+      name: 'dhlottery-official-api',
+      run: () => collectViaOfficialApi({ cursorRound: existingLatestRound }),
+    },
     { name: 'dhlottery-http', run: () => collectViaHttp() },
     { name: 'dhlottery-browser', run: () => collectViaBrowser() },
   ];
@@ -42,17 +52,33 @@ async function main() {
   }
 
   if (!selected) {
-    await writeStatus({ ok: false, stage: 'collect', attempts, message: 'All automatic collectors failed. Existing data was preserved.' });
+    await writeStatus({
+      ok: false,
+      stage: 'collect',
+      attempts,
+      message: 'All automatic collectors failed. Existing data was preserved.',
+    });
     throw new Error('all collectors failed; existing data preserved');
   }
 
-  const agreement = successful.filter((d) => sameDraw(d, selected)).length;
+  const agreement = successful.filter((draw) => sameDraw(draw, selected)).length;
   const { rows, changed } = await upsertCsv(selected);
   const latest = rows.at(-1);
-  const status = { ok: true, changed, source: selected.source, agreement, attempts, message: changed ? 'New draw stored.' : 'Already up to date.' };
+  const status = {
+    ok: true,
+    changed,
+    source: selected.source,
+    agreement,
+    attempts,
+    message: changed ? 'New draw stored.' : 'Already up to date.',
+  };
+
   await writeDataFiles(rows, latest, status);
   if (!collectOnly) status.supabase = await syncSupabase(rows);
   console.log(JSON.stringify({ latest, ...status }, null, 2));
 }
 
-main().catch((error) => { console.error(error); process.exitCode = 1; });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
