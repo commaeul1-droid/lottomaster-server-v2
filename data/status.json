@@ -1,9 +1,27 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-07-16T06:02:49.950Z",
+  "updatedAt": "2026-07-18T15:33:41.003Z",
   "ok": true,
-  "stage": "health",
-  "csvRows": 1232,
-  "latestRound": 1232,
-  "latestJsonRound": 1232
+  "changed": true,
+  "source": "dhlottery-official-api",
+  "agreement": 1,
+  "attempts": [
+    {
+      "collector": "dhlottery-official-api",
+      "ok": true,
+      "round": 1233
+    },
+    {
+      "collector": "dhlottery-http",
+      "ok": false,
+      "error": "official page returned access-control content without parseable result"
+    },
+    {
+      "collector": "dhlottery-browser",
+      "ok": false,
+      "error": "official page returned access-control content without parseable result"
+    }
+  ],
+  "message": "New draw stored.",
+  "latestRound": 1233
 }
