@@ -7,6 +7,7 @@ import { readCsv, upsertCsv } from './storage/csv-store.js';
 import { writeDataFiles, writeStatus } from './storage/json-store.js';
 import { syncSupabase } from './storage/supabase-store.js';
 import { sameDraw } from './validators/draw-validator.js';
+import { assessStoredRound } from './lib/draw-freshness.js';
 
 const collectOnly = process.argv.includes('--collect-only');
 const syncOnly = process.argv.includes('--sync-only');
@@ -22,9 +23,27 @@ async function main() {
   // only rounds newer than the locally stored cursor.
   const existingRows = await readCsv();
   const existingLatestRound = existingRows.at(-1)?.round ?? null;
+  const checkedAt = new Date();
+  const storedFreshness = assessStoredRound(existingLatestRound, checkedAt);
 
   const attempts = [];
   const manual = collectManual();
+  const forceCollection =
+    Boolean(manual) || process.argv.includes('--force-collect');
+  if (!forceCollection && storedFreshness.state === 'current') {
+    const latest = existingRows.at(-1);
+    console.log(JSON.stringify({
+      latest,
+      ok: true,
+      changed: false,
+      source: 'seed-csv-current',
+      agreement: 0,
+      attempts,
+      expectedLatestRound: storedFreshness.expectedRound,
+      message: 'Already up to date; automatic collection was not required.',
+    }, null, 2));
+    return;
+  }
   const collectors = [
     ...(manual ? [{ name: 'manual-emergency', run: async () => manual }] : []),
     ...(process.env.LOTTO_SOURCE_URLS ? [{ name: 'external-source', run: () => collectViaExternalSources(process.env.LOTTO_SOURCE_URLS) }] : []),
@@ -56,9 +75,34 @@ async function main() {
       ok: false,
       stage: 'collect',
       attempts,
-      message: 'All automatic collectors failed. Existing data was preserved.',
+      existingLatestRound,
+      expectedLatestRound: storedFreshness.expectedRound,
+      freshness: storedFreshness.state,
+      message:
+        'All automatic collectors failed while a newer official draw was required. Existing data was preserved.',
     });
-    throw new Error('all collectors failed; existing data preserved');
+    throw new Error(
+      `all collectors failed; latest=${existingLatestRound ?? 'none'}, ` +
+      `expected=${storedFreshness.expectedRound}; existing data preserved`,
+    );
+  }
+
+  const selectedFreshness = assessStoredRound(selected.round, checkedAt);
+  if (selectedFreshness.state !== 'current') {
+    await writeStatus({
+      ok: false,
+      stage: 'freshness',
+      attempts,
+      selectedRound: selected.round,
+      expectedLatestRound: selectedFreshness.expectedRound,
+      freshness: selectedFreshness.state,
+      message:
+        'A collector returned a valid draw structure, but its round was not the expected current round. Existing data was preserved.',
+    });
+    throw new Error(
+      `collector returned ${selectedFreshness.state} round ` +
+      `${selected.round}; expected=${selectedFreshness.expectedRound}`,
+    );
   }
 
   const agreement = successful.filter((draw) => sameDraw(draw, selected)).length;
@@ -70,6 +114,7 @@ async function main() {
     source: selected.source,
     agreement,
     attempts,
+    expectedLatestRound: selectedFreshness.expectedRound,
     message: changed ? 'New draw stored.' : 'Already up to date.',
   };
 

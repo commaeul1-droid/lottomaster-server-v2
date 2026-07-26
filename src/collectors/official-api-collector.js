@@ -25,19 +25,24 @@ export async function collectViaOfficialApi({
   cursorRound = null,
   timeoutMs = 20000,
 } = {}) {
-  const cookie = await warmOfficialSession(timeoutMs);
+  const attempts = [];
+  let cookie = '';
+  try {
+    cookie = await warmOfficialSession(timeoutMs);
+  } catch (error) {
+    attempts.push(`session warm-up: ${error.message}`);
+  }
   const headers = {
     ...DEFAULT_HEADERS,
     ...(cookie ? { cookie } : {}),
   };
 
   const cursor = Number.isInteger(Number(cursorRound)) ? Number(cursorRound) : null;
-  const attempts = [];
 
   const queries = [
     ...(cursor ? [{ srchDir: 'latest', srchCursorLtEpsd: String(cursor) }] : []),
     ...(cursor ? [{ srchDir: 'center', srchLtEpsd: String(cursor + 1) }] : []),
-    { srchDir: 'latest', srchCursorLtEpsd: String(cursor ?? 1) },
+    { srchDir: 'latest', srchCursorLtEpsd: '1' },
   ];
 
   for (const query of queries) {

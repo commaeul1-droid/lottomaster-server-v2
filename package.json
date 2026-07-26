@@ -13,7 +13,7 @@
     "health": "node scripts/health_check.js",
     "validate": "node scripts/validate_data.js",
     "test": "node --test",
-    "lint": "node --check scripts/update_lotto_data.js && node --check scripts/fetch_latest_draw.js && node --check scripts/sync_supabase.js && node --check src/update.js && node --check src/health-check.js"
+    "lint": "node --check scripts/update_lotto_data.js && node --check scripts/fetch_latest_draw.js && node --check scripts/sync_supabase.js && node --check src/update.js && node --check src/health-check.js && node --check scripts/check_update_needed.js && node --check src/lib/draw-freshness.js && node --check src/collectors/official-api-collector.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

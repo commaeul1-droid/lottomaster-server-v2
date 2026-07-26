@@ -61,7 +61,17 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Check collection requirement
+        id: preflight
+        env:
+          MANUAL_ROUND: ${{ inputs.round }}
+          MANUAL_NUMBERS: ${{ inputs.numbers }}
+          MANUAL_BONUS: ${{ inputs.bonus }}
+          MANUAL_DRAW_DATE: ${{ inputs.draw_date }}
+        run: node scripts/check_update_needed.js
+
       - name: Install Chromium
+        if: steps.preflight.outputs.collection_required == 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Collect, validate and sync
