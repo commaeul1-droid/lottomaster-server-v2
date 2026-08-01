@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-07-25T15:50:50.027Z",
+  "updatedAt": "2026-08-01T15:44:23.331Z",
   "ok": true,
   "changed": true,
   "source": "dhlottery-official-api",
@@ -9,7 +9,7 @@
     {
       "collector": "dhlottery-official-api",
       "ok": true,
-      "round": 1234
+      "round": 1235
     },
     {
       "collector": "dhlottery-http",
@@ -22,6 +22,7 @@
       "error": "official page returned access-control content without parseable result"
     }
   ],
+  "expectedLatestRound": 1235,
   "message": "New draw stored.",
-  "latestRound": 1234
+  "latestRound": 1235
 }
