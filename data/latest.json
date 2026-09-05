@@ -1,18 +1,18 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-08-29T16:41:38.179Z",
+  "updatedAt": "2026-09-05T15:09:35.659Z",
   "latest": {
-    "round": 1239,
+    "round": 1240,
     "numbers": [
       11,
       13,
-      22,
-      32,
-      33,
-      36
+      19,
+      20,
+      31,
+      44
     ],
-    "bonus": 8,
-    "drawDate": "2026-08-29",
+    "bonus": 27,
+    "drawDate": "2026-09-05",
     "source": "dhlottery-official-api"
   }
 }
