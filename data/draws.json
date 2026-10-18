@@ -1,9 +1,23 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-10T17:19:33.064Z",
-  "latestRound": 1245,
-  "count": 1245,
+  "updatedAt": "2026-10-18T00:57:12.196Z",
+  "latestRound": 1246,
+  "count": 1246,
   "draws": [
+    {
+      "round": 1246,
+      "numbers": [
+        16,
+        22,
+        23,
+        24,
+        27,
+        28
+      ],
+      "bonus": 6,
+      "drawDate": "2026-10-17",
+      "source": "dhlottery-official-api"
+    },
     {
       "round": 1245,
       "numbers": [
@@ -16,7 +30,7 @@
       ],
       "bonus": 12,
       "drawDate": "2026-10-10",
-      "source": "dhlottery-official-api"
+      "source": "seed-csv"
     },
     {
       "round": 1244,
